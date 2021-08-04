@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Sales.Services
 {
@@ -16,11 +17,9 @@ namespace Sales.Services
         private readonly TimeSpan _semaphoreWaitTimeout = TimeSpan.FromSeconds(20);
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _semaphores = new();
 
-        public async Task<T> ReadFromFileAsync<T>(string fileName, string folderName)
+        public async Task<T> ReadFromFileAsync<T>(string filePath)
         {
-            ValidateFileArguments(fileName, folderName);
-            if (!fileName.EndsWith(JSON_FILE_EXT)) fileName += JSON_FILE_EXT;
-            string filePath = Path.Combine(folderName, fileName);
+            if (!filePath.EndsWith(JSON_FILE_EXT)) filePath += JSON_FILE_EXT;
             SemaphoreSlim semaphore = new(FILE_ACCESS_LIMIT);
             semaphore = _semaphores.GetOrAdd(filePath, semaphore);
             try
@@ -36,10 +35,37 @@ namespace Sales.Services
             }
         }
 
-        public Task WriteToFileAsync(string fileName, string folderName, object data)
+        public async Task<T> ReadFromFileAsync<T>(string fileName, string folderName)
         {
-            ValidateFileArguments(fileName, folderName, data);
-            throw new NotImplementedException();
+            ValidateFileArguments(fileName, folderName);
+            if (!fileName.EndsWith(JSON_FILE_EXT)) fileName += JSON_FILE_EXT;
+            string filePath = Path.Combine(folderName, fileName);
+            return await ReadFromFileAsync<T>(filePath);
+        }
+
+        public async Task WriteToFileAsync<T>(string fileName, string folderName, T item)
+        {
+            ValidateFileArguments(fileName, folderName, item);
+            if (!fileName.EndsWith(JSON_FILE_EXT)) fileName += JSON_FILE_EXT;
+            string filePath = Path.Combine(folderName, fileName);
+            List<T> items = new();
+            if (File.Exists(filePath))
+            {
+                items = await ReadFromFileAsync<List<T>>(filePath);
+            }
+            items.Add(item);
+            string json = JsonConvert.SerializeObject(items, Formatting.Indented);
+            SemaphoreSlim semaphore = new(FILE_ACCESS_LIMIT);
+            semaphore = _semaphores.GetOrAdd(filePath, semaphore);
+            try
+            {
+                await semaphore.WaitAsync(_semaphoreWaitTimeout);
+                await File.WriteAllTextAsync(filePath, json);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         private static void ValidateFileArguments(string fileName, string folderName)

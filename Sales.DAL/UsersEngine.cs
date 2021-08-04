@@ -17,5 +17,11 @@ namespace Sales.DAL
             List<UserEntity> users = await GetItemsAsync<UserEntity>(EntityTypes.Users);
             return users.FirstOrDefault(user => user.UserId == userId);
         }
+
+        public async Task<bool> IsUserExistsAsync(string userId)
+        {
+            List<UserEntity> users = await GetItemsAsync<UserEntity>(EntityTypes.Users);
+            return users.Any(user => user.UserId == userId);
+        }
     }
 }

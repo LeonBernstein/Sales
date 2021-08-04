@@ -7,5 +7,6 @@ namespace Sales.Common.Interfaces.BL
     {
         Task<UserEntity> GetUserByIdAsync(string userId);
         Task<bool> AreUsersDetailsValidAsync(string userId, string password, string otp = null);
+        Task<bool> IsUserExistsAsync(string userId);
     }
 }

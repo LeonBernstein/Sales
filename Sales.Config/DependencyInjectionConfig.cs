@@ -22,6 +22,8 @@ namespace Sales.Config
             services.AddMemoryCache();
             services.AddTransient<IUsersLogic, UsersLogic>();
             services.AddTransient<IUsersEngine, UsersEngine>();
+            services.AddTransient<ICustomersEngine, CustomersEngine>();
+            services.AddTransient<ICustomersLogic, CustomersLogic>();
             services.AddSingleton<IJsonFileHandlerService, JsonFileHandlerService>();
             services.AddSingleton<IOtpService, OtpService>();
             services.AddSingleton<ICacheService, CacheService>();

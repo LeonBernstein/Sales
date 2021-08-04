@@ -6,5 +6,6 @@ namespace Sales.Common.Interfaces.DAL
     public interface IUsersEngine
     {
         Task<UserEntity> GetUserByIdAsync(string userId);
+        Task<bool> IsUserExistsAsync(string userId);
     }
 }

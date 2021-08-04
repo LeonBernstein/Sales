@@ -5,6 +5,7 @@ using Sales.Common.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
@@ -23,14 +24,14 @@ namespace Sales.Services
         {
             var currDate = DateTime.UtcNow;
             SigningCredentials signingKey = GenerateSigningKey();
-            List<Claim> claims = new()
+            Dictionary<string, object> claims = new()
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                { JwtRegisteredClaimNames.NameId, userId.ToString() },
+                { JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString() },
             };
             SecurityTokenDescriptor tokenDescriptor = new()
             {
-                Subject = new ClaimsIdentity(claims),
+                Claims = claims,
                 Issuer = APP_NAME,
                 IssuedAt = currDate,
                 NotBefore = currDate,
@@ -49,7 +50,7 @@ namespace Sales.Services
             try
             {
                 JwtSecurityTokenHandler tokenHandler = new();
-                if (tokenHandler.ReadToken(token) is not JwtSecurityToken) return false;
+                if (tokenHandler.ReadToken(token) is not JwtSecurityToken securityToken) return false;
                 SigningCredentials signingKey = GenerateSigningKey();
                 var validationParameters = new TokenValidationParameters()
                 {
@@ -60,9 +61,8 @@ namespace Sales.Services
                     ValidIssuers = new string[] { APP_NAME, },
                     IssuerSigningKey = signingKey.Key,
                 };
-
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken _);
-                //principal.Claims.
+                tokenHandler.ValidateToken(token, validationParameters, out SecurityToken _);
+                userId = securityToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.NameId).Value;
                 return true;
             }
             catch (Exception e)

@@ -4,7 +4,6 @@ using Sales.Common.Exceptions;
 using Sales.Common.Interfaces.BL;
 using Sales.Common.Interfaces.DAL;
 using Sales.Common.Interfaces.Services;
-using System;
 using System.Threading.Tasks;
 
 namespace Sales.BL
@@ -68,6 +67,11 @@ namespace Sales.BL
             var isOtpValid = cachedOtp == otp;
             if (isOtpValid) _cacheService.RemoveItem(CacheRegions.OPT, userId);
             return isOtpValid;
+        }
+
+        public async Task<bool> IsUserExistsAsync(string userId)
+        {
+            return await _usersEngine.IsUserExistsAsync(userId);
         }
 
         private static string GenerateOtpSmsMessage(string otp)

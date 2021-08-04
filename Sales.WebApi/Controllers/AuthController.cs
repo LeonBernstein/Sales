@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -89,6 +88,18 @@ namespace Sales.WebApi.Controllers
             string token = _tokenService.GenerateToken(model.UserId);
             Response.Cookies.Append(Globals.AUTH_COOKIE_NAME, token, GetAuthCookieOptions());
             return NoContent();
+        }
+
+        internal static CookieOptions GetAuthCookieOptions()
+        {
+            return new CookieOptions()
+            {
+                Path = "/",
+                Expires = DateTime.UtcNow.AddHours(Globals.AUTH_TOKEN_EXP_IN_HOURS),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+            };
         }
     }
 }

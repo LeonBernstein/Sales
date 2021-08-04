@@ -21,9 +21,7 @@ namespace Sales.DAL
 
         protected async Task InsertItemAsync<T>(EntityTypes type, T item)
         {
-            List<T> items = await GetItemsAsync<T>(type);
-            items.Add(item);
-            await _jsonFileHandler.WriteToFileAsync(type.Value + FILE_EXT, FOLDER_NAME, items);
+            await _jsonFileHandler.WriteToFileAsync(type.Value + FILE_EXT, FOLDER_NAME, item);
         }
     }
 }
