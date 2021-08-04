@@ -18,15 +18,18 @@ namespace Sales.WebApi.Controllers
     {
         private readonly IUsersLogic _usersLogic;
         private readonly ITokenService _tokenService;
+        private readonly AppSettings _appSettings;
 
         public AuthController(
             ILogger<SalesBaseController> logger,
             IUsersLogic usersLogic,
-            ITokenService tokenService
+            ITokenService tokenService,
+            AppSettings appSettings
         ) : base(logger)
         {
             _usersLogic = usersLogic;
             _tokenService = tokenService;
+            _appSettings = appSettings;
         }
 
 
@@ -86,16 +89,16 @@ namespace Sales.WebApi.Controllers
                 : await _usersLogic.AreUsersDetailsValidAsync(model.UserId, model.Password);
             if (!isUserValid) return Unauthorized("Invalid credentials.");
             string token = _tokenService.GenerateToken(model.UserId);
-            Response.Cookies.Append(Globals.AUTH_COOKIE_NAME, token, GetAuthCookieOptions());
+            Response.Cookies.Append(_appSettings.AuthCookieName, token, GetAuthCookieOptions(_appSettings.AuthTokenExpInHours));
             return NoContent();
         }
 
-        internal static CookieOptions GetAuthCookieOptions()
+        internal static CookieOptions GetAuthCookieOptions(int expiresInHours)
         {
             return new CookieOptions()
             {
                 Path = "/",
-                Expires = DateTime.UtcNow.AddHours(Globals.AUTH_TOKEN_EXP_IN_HOURS),
+                Expires = DateTime.UtcNow.AddHours(expiresInHours),
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,

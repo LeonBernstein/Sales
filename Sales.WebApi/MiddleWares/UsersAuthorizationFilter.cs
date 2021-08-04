@@ -18,16 +18,19 @@ namespace Sales.WebApi.MiddleWares
         private readonly ILogger _logger;
         private readonly IUsersLogic _usersLogic;
         private readonly ITokenService _tokenService;
+        private readonly AppSettings _appSettings;
 
         public UsersAuthorizationFilter(
             ILogger<UsersAuthorizationFilter> logger,
             IUsersLogic usersLogic,
-            ITokenService tokenService
+            ITokenService tokenService,
+            AppSettings appSettings
         )
         {
             _logger = logger;
             _usersLogic = usersLogic;
             _tokenService = tokenService;
+            _appSettings = appSettings;
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -36,7 +39,7 @@ namespace Sales.WebApi.MiddleWares
             {
                 if (context.ActionDescriptor.EndpointMetadata.Any(item => item is IAllowAnonymous)) return;
                 HttpRequest request = context.HttpContext.Request;
-                if (!request.Cookies.TryGetValue(Globals.AUTH_COOKIE_NAME, out string token)
+                if (!request.Cookies.TryGetValue(_appSettings.AuthCookieName, out string token)
                   || !_tokenService.IsTokenValid(token, out string userId)
                   || !await _usersLogic.IsUserExistsAsync(userId)
                 )
@@ -47,7 +50,11 @@ namespace Sales.WebApi.MiddleWares
                 {
                     string newToken = _tokenService.GenerateToken(userId);
                     HttpResponse response = context.HttpContext.Response;
-                    response.Cookies.Append(Globals.AUTH_COOKIE_NAME, newToken, AuthController.GetAuthCookieOptions());
+                    response.Cookies.Append(
+                        _appSettings.AuthCookieName,
+                        newToken,
+                        AuthController.GetAuthCookieOptions(_appSettings.AuthTokenExpInHours)
+                    );
                 }
             }
             catch (Exception e)

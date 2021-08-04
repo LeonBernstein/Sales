@@ -7,11 +7,18 @@ namespace Sales.Services
 {
     public class OtpService : IOtpService
     {
+        private readonly AppSettings _appSettings;
+
+        public OtpService(AppSettings appSettings)
+        {
+            _appSettings = appSettings;
+        }
+
         public string GenerateOTP()
         {
             StringBuilder sb = new();
             Random random = new();
-            for (int i = 0; i < Globals.OPT_LENGTH; i++)
+            for (int i = 0; i < _appSettings.OPTLength; i++)
             {
                 int randomNumber = random.Next(0, 9);
                 sb.Append(randomNumber);

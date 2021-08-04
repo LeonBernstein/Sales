@@ -6,19 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Text;
 
 namespace Sales.Services
 {
     public class JwtTokenService : ITokenService
     {
-        private const string APP_NAME = "SalesApp";
-        private const string SECURE_KEY = "eaQRTRexC09ffKPOcw9nVzxikSDaYCt6";
-
         private readonly ILogger _logger;
+        private readonly AppSettings _appSettings;
 
-        public JwtTokenService(ILogger<JwtTokenService> logger) => _logger = logger;
+        public JwtTokenService(ILogger<JwtTokenService> logger, AppSettings appSettings)
+        {
+            _appSettings = appSettings;
+            _logger = logger;
+        }
 
         public string GenerateToken(string userId)
         {
@@ -32,10 +33,10 @@ namespace Sales.Services
             SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Claims = claims,
-                Issuer = APP_NAME,
+                Issuer = _appSettings.AppName,
                 IssuedAt = currDate,
                 NotBefore = currDate,
-                Expires = currDate.AddHours(Globals.AUTH_TOKEN_EXP_IN_HOURS),
+                Expires = currDate.AddHours(_appSettings.AuthTokenExpInHours),
                 SigningCredentials = signingKey,
             };
             JwtSecurityTokenHandler tokenHandler = new();
@@ -58,7 +59,7 @@ namespace Sales.Services
                     ValidateIssuer = true,
                     ValidateAudience = false,
                     ValidateLifetime = true,
-                    ValidIssuers = new string[] { APP_NAME, },
+                    ValidIssuers = new string[] { _appSettings.AppName, },
                     IssuerSigningKey = signingKey.Key,
                 };
                 tokenHandler.ValidateToken(token, validationParameters, out SecurityToken _);
@@ -72,9 +73,9 @@ namespace Sales.Services
             }
         }
 
-        private static SigningCredentials GenerateSigningKey()
+        private SigningCredentials GenerateSigningKey()
         {
-            byte[] secureKeyBytes = Encoding.UTF8.GetBytes(SECURE_KEY);
+            byte[] secureKeyBytes = Encoding.UTF8.GetBytes(_appSettings.SecureKey);
             SymmetricSecurityKey symmetricSecurityKey = new(secureKeyBytes);
             SigningCredentials signingKey = new(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
             return signingKey;

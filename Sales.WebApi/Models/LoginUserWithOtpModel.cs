@@ -1,12 +1,11 @@
-﻿using Sales.Common;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Sales.WebApi.Models
 {
     public class LoginUserWithOtpModel : LoginUserModel
     {
         [Required]
-        [StringLength(Globals.OPT_LENGTH)]
+        [StringLength(6)]
         public string OTP { get; set; }
     }
 }
