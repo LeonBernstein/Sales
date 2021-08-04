@@ -1,0 +1,14 @@
+[
+  {
+    "UserId": "11223344",
+    "Password": "Pa$$w@rd",
+    "IsOTPRequired": false,
+    "PhoneNumber": "0545556667"
+  },
+  {
+    "UserId": "66332211",
+    "Password": "Pa$$w@rd",
+    "IsOTPRequired": true,
+    "PhoneNumber": "0547666555"
+  }
+]
