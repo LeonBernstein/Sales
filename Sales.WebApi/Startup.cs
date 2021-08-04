@@ -32,11 +32,11 @@ namespace Sales.WebApi
             services.AddControllers(options => options.Filters.Add<UsersAuthorizationFilter>())
                 .AddControllersAsServices();
 
-            // Configures AppSettings bindings for WebAppSettings class.
+            // Configures AppSettings bindings for AppSettings class.
             services.AddTransient(options =>
             {
-                WebAppSettings result = _configuration.GetSection("AppSettings")
-                    .Get<WebAppSettings>();
+                AppSettings result = _configuration.GetSection("AppSettings")
+                    .Get<AppSettings>();
 
                 bool isValid = Validator.TryValidateObject(result,
                     new System.ComponentModel.DataAnnotations.ValidationContext(result),

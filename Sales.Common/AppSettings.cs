@@ -2,7 +2,7 @@
 
 namespace Sales.Common
 {
-    public class WebAppSettings
+    public class AppSettings
     {
         [Required]
         public string AppName { get; set; }
@@ -15,5 +15,7 @@ namespace Sales.Common
         public string AuthCookieName { get; set; }
         [Required]
         public string SecureKey { get; set; }
+        [Required]
+        public int OPTExperationInMins { get; set; }
     }
 }

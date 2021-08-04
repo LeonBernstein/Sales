@@ -13,9 +13,9 @@ namespace Sales.Services
     public class JwtTokenService : ITokenService
     {
         private readonly ILogger _logger;
-        private readonly WebAppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
-        public JwtTokenService(ILogger<JwtTokenService> logger, WebAppSettings appSettings)
+        public JwtTokenService(ILogger<JwtTokenService> logger, AppSettings appSettings)
         {
             _appSettings = appSettings;
             _logger = logger;
@@ -59,7 +59,9 @@ namespace Sales.Services
                     ValidateIssuer = true,
                     ValidateAudience = false,
                     ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
                     ValidIssuers = new string[] { _appSettings.AppName, },
+                    ClockSkew = TimeSpan.Zero,
                     IssuerSigningKey = signingKey.Key,
                 };
                 tokenHandler.ValidateToken(token, validationParameters, out SecurityToken _);

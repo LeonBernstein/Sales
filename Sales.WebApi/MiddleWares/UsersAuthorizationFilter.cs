@@ -18,13 +18,13 @@ namespace Sales.WebApi.MiddleWares
         private readonly ILogger _logger;
         private readonly IUsersLogic _usersLogic;
         private readonly ITokenService _tokenService;
-        private readonly WebAppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
         public UsersAuthorizationFilter(
             ILogger<UsersAuthorizationFilter> logger,
             IUsersLogic usersLogic,
             ITokenService tokenService,
-            WebAppSettings appSettings
+            AppSettings appSettings
         )
         {
             _logger = logger;

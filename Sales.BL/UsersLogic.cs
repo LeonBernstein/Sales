@@ -10,24 +10,25 @@ namespace Sales.BL
 {
     public class UsersLogic : IUsersLogic
     {
-        private const int OPT_EXPIRATION_IN_MINS = 20;
-
         private readonly IUsersEngine _usersEngine;
         private readonly IOtpService _otpService;
         private readonly ICacheService _cacheService;
         private readonly ISmsService _smsService;
+        private readonly AppSettings _appSettings;
 
         public UsersLogic(
             IUsersEngine usersEngine,
             IOtpService otpService,
             ICacheService cacheService,
-            ISmsService smsService
+            ISmsService smsService,
+            AppSettings appSettings
          )
         {
             _usersEngine = usersEngine;
             _otpService = otpService;
             _cacheService = cacheService;
             _smsService = smsService;
+            _appSettings = appSettings;
         }
 
         public async Task<UserEntity> GetUserByIdAsync(string userId)
@@ -43,7 +44,7 @@ namespace Sales.BL
             {
                 throw new AppException("\"UsersLogic\" received an invalid one time password.");
             }
-            var cacheOTPItem = CacheItemEntity.CreateOTPCacheItem(userId, otp, OPT_EXPIRATION_IN_MINS);
+            var cacheOTPItem = CacheItemEntity.CreateOTPCacheItem(userId, otp, _appSettings.OPTExperationInMins);
             _cacheService.UpsertItem(cacheOTPItem);
             string otpSmsMessage = GenerateOtpSmsMessage(otp);
             _smsService.SendSmsInBackground(user.PhoneNumber, otpSmsMessage);
@@ -74,9 +75,9 @@ namespace Sales.BL
             return await _usersEngine.IsUserExistsAsync(userId);
         }
 
-        private static string GenerateOtpSmsMessage(string otp)
+        private string GenerateOtpSmsMessage(string otp)
         {
-            return $"Sales App: Your security code is: {otp}. It expires in {OPT_EXPIRATION_IN_MINS} minutes.";
+            return $"Sales App: Your security code is: {otp}. It expires in {_appSettings.OPTExperationInMins} minutes.";
         }
     }
 }

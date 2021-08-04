@@ -18,13 +18,13 @@ namespace Sales.WebApi.Controllers
     {
         private readonly IUsersLogic _usersLogic;
         private readonly ITokenService _tokenService;
-        private readonly WebAppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
         public AuthController(
             ILogger<SalesBaseController> logger,
             IUsersLogic usersLogic,
             ITokenService tokenService,
-            WebAppSettings appSettings
+            AppSettings appSettings
         ) : base(logger)
         {
             _usersLogic = usersLogic;
