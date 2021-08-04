@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using System.IO;
 
 namespace Sales.WebApi
 {
@@ -16,11 +14,6 @@ namespace Sales.WebApi
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.ConfigureAppConfiguration(config =>
-                    {
-                        config.SetBasePath(Directory.GetCurrentDirectory());
-                        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }

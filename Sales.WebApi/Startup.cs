@@ -7,17 +7,20 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sales.Common;
 using Sales.Common.Entities;
+using Sales.Common.Exceptions;
 using Sales.Config;
 using Sales.WebApi.MiddleWares;
 using Sales.WebApi.Models;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sales.WebApi
 {
     public class Startup
     {
-        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration) => _configuration = configuration;
+        public Startup(IConfiguration configuration) => _configuration = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -25,11 +28,30 @@ namespace Sales.WebApi
         {
             services.AddLogging(logging => logging.AddConsole());
 
+            // The "UsersAuthorizationFilter" is responsible for athorizing access for non anonymous controllers..
             services.AddControllers(options => options.Filters.Add<UsersAuthorizationFilter>())
                 .AddControllersAsServices();
 
+            // Configures AppSettings bindings for WebAppSettings class.
+            services.AddTransient(options =>
+            {
+                WebAppSettings result = _configuration.GetSection("AppSettings")
+                    .Get<WebAppSettings>();
+
+                bool isValid = Validator.TryValidateObject(result,
+                    new System.ComponentModel.DataAnnotations.ValidationContext(result),
+                    new List<ValidationResult>(),
+                    true
+                 );
+                if (!isValid)
+                {
+                    throw new AppException("Not all app settings are valid.");
+                }
+                return result;
+            });
+
             // Non WebApi DI is implemented in a dedicated assembly so that future startup projects could use the same configurations and also the current startup project won't need to depend on other logical assemblies like BL.
-            DependencyInjectionConfig.ConfigureDI(services, _configuration);
+            DependencyInjectionConfig.ConfigureDI(services);
 
             services.AddAutoMapper(cfg =>
             {

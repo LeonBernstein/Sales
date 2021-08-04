@@ -18,13 +18,13 @@ namespace Sales.WebApi.Controllers
     {
         private readonly IUsersLogic _usersLogic;
         private readonly ITokenService _tokenService;
-        private readonly AppSettings _appSettings;
+        private readonly WebAppSettings _appSettings;
 
         public AuthController(
             ILogger<SalesBaseController> logger,
             IUsersLogic usersLogic,
             ITokenService tokenService,
-            AppSettings appSettings
+            WebAppSettings appSettings
         ) : base(logger)
         {
             _usersLogic = usersLogic;
@@ -34,6 +34,7 @@ namespace Sales.WebApi.Controllers
 
 
         [HttpGet, Route("GetLoginRequirements")]
+        // If the user exists in the json file, then his phone number and is-OTP required will be returned.
         public async Task<IActionResult> GetLoginRequirements(string userId)
         {
             try
@@ -56,6 +57,7 @@ namespace Sales.WebApi.Controllers
         }
 
         [HttpPost, Route("Login")]
+        // Login method without OTP.
         public async Task<IActionResult> Login([FromBody] LoginUserModel model)
         {
             try
@@ -69,6 +71,7 @@ namespace Sales.WebApi.Controllers
         }
 
         [HttpPost, Route("LoginWithOTP")]
+        // Login method with OTP (uses diffrent model then the regular login method).
         public async Task<IActionResult> LoginWithOTP([FromBody] LoginUserWithOtpModel model)
         {
             try
@@ -81,6 +84,7 @@ namespace Sales.WebApi.Controllers
             }
         }
 
+        // DRY login method that handles both OTP and non OTP validation.
         private async Task<IActionResult> LoginHandlerAsync(LoginUserModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -93,6 +97,7 @@ namespace Sales.WebApi.Controllers
             return NoContent();
         }
 
+        // Generates cookie options for the token.
         internal static CookieOptions GetAuthCookieOptions(int expiresInHours)
         {
             return new CookieOptions()

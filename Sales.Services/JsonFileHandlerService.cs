@@ -9,6 +9,10 @@ using System.Collections.Generic;
 
 namespace Sales.Services
 {
+    /// <summary>
+    /// This service can handle queue for multiple read and writes for the same file.
+    /// Also all methods are non blocking and thread safe.
+    /// </summary>
     public class JsonFileHandlerService : IJsonFileHandlerService
     {
         private const string JSON_FILE_EXT = ".json";

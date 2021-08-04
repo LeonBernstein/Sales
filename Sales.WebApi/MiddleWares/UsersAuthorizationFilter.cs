@@ -18,13 +18,13 @@ namespace Sales.WebApi.MiddleWares
         private readonly ILogger _logger;
         private readonly IUsersLogic _usersLogic;
         private readonly ITokenService _tokenService;
-        private readonly AppSettings _appSettings;
+        private readonly WebAppSettings _appSettings;
 
         public UsersAuthorizationFilter(
             ILogger<UsersAuthorizationFilter> logger,
             IUsersLogic usersLogic,
             ITokenService tokenService,
-            AppSettings appSettings
+            WebAppSettings appSettings
         )
         {
             _logger = logger;
@@ -37,8 +37,10 @@ namespace Sales.WebApi.MiddleWares
         {
             try
             {
+                // Skips validation if an Action/ Controller has a "AllowAnonymous" attribute.
                 if (context.ActionDescriptor.EndpointMetadata.Any(item => item is IAllowAnonymous)) return;
                 HttpRequest request = context.HttpContext.Request;
+                // Token and user validation
                 if (!request.Cookies.TryGetValue(_appSettings.AuthCookieName, out string token)
                   || !_tokenService.IsTokenValid(token, out string userId)
                   || !await _usersLogic.IsUserExistsAsync(userId)
@@ -48,6 +50,7 @@ namespace Sales.WebApi.MiddleWares
                 }
                 else
                 {
+                    // If the token is valid, a new token will be generated and applied to Set-Cookie header.
                     string newToken = _tokenService.GenerateToken(userId);
                     HttpResponse response = context.HttpContext.Response;
                     response.Cookies.Append(

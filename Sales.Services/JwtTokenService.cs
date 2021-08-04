@@ -13,9 +13,9 @@ namespace Sales.Services
     public class JwtTokenService : ITokenService
     {
         private readonly ILogger _logger;
-        private readonly AppSettings _appSettings;
+        private readonly WebAppSettings _appSettings;
 
-        public JwtTokenService(ILogger<JwtTokenService> logger, AppSettings appSettings)
+        public JwtTokenService(ILogger<JwtTokenService> logger, WebAppSettings appSettings)
         {
             _appSettings = appSettings;
             _logger = logger;

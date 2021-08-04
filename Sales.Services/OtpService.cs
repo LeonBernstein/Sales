@@ -7,9 +7,9 @@ namespace Sales.Services
 {
     public class OtpService : IOtpService
     {
-        private readonly AppSettings _appSettings;
+        private readonly WebAppSettings _appSettings;
 
-        public OtpService(AppSettings appSettings)
+        public OtpService(WebAppSettings appSettings)
         {
             _appSettings = appSettings;
         }
