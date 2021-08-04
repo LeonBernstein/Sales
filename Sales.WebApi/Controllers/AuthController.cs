@@ -35,6 +35,7 @@ namespace Sales.WebApi.Controllers
 
         [HttpGet, Route("GetLoginRequirements")]
         // If the user exists in the json file, then his phone number and is-OTP required will be returned.
+        // The OTP can be the was sent to the user via SMS can be viewed in the console.
         public async Task<IActionResult> GetLoginRequirements(string userId)
         {
             try
@@ -72,6 +73,7 @@ namespace Sales.WebApi.Controllers
 
         [HttpPost, Route("LoginWithOTP")]
         // Login method with OTP (uses diffrent model then the regular login method).
+        // The OTP can be the was sent to the user via SMS can be viewed in the console.
         public async Task<IActionResult> LoginWithOTP([FromBody] LoginUserWithOtpModel model)
         {
             try
