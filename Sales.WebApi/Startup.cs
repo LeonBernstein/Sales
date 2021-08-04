@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Sales.Common.Entities;
 using Sales.Config;
+using Sales.WebApi.MiddleWares;
 using Sales.WebApi.Models;
 
 namespace Sales.WebApi
@@ -18,7 +19,7 @@ namespace Sales.WebApi
         {
             services.AddLogging(logging => logging.AddConsole());
 
-            services.AddControllers()
+            services.AddControllers(options => options.Filters.Add<UsersAuthorizationFilter>())
                 .AddControllersAsServices();
 
             // Non WebApi DI is implemented in a dedicated assembly so that future startup projects could use the same configurations and also the current startup project won't need to depend on other logical assemblies like BL.
@@ -26,6 +27,7 @@ namespace Sales.WebApi
 
             services.AddAutoMapper(cfg =>
             {
+                cfg.CreateMap<CustomerModel, CustomerEntity>();
             });
         }
 

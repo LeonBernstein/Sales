@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
+using Sales.Common;
 using System;
 
 namespace Sales.WebApi.Controllers
@@ -16,6 +16,18 @@ namespace Sales.WebApi.Controllers
         {
             _logger.LogError(e, e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        internal static CookieOptions GetAuthCookieOptions()
+        {
+            return new CookieOptions()
+            {
+                Path = "/",
+                Expires = DateTime.UtcNow.AddHours(Globals.AUTH_TOKEN_EXP_IN_HOURS),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+            };
         }
     }
 }

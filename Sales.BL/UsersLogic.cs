@@ -65,7 +65,9 @@ namespace Sales.BL
             if (!user.IsOTPRequired) return true;
             if (otp == null) return false;
             string cachedOtp = _cacheService.GetItem<string>(CacheRegions.OPT, userId);
-            return cachedOtp == otp;
+            var isOtpValid = cachedOtp == otp;
+            if (isOtpValid) _cacheService.RemoveItem(CacheRegions.OPT, userId);
+            return isOtpValid;
         }
 
         private static string GenerateOtpSmsMessage(string otp)

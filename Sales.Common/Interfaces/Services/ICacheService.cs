@@ -9,5 +9,7 @@ namespace Sales.Common.Interfaces.Services
         object GetItem(CacheRegions region, string key);
 
         T GetItem<T>(CacheRegions region, string key);
+
+        void RemoveItem(CacheRegions region, string key);
     }
 }

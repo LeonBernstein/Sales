@@ -26,6 +26,7 @@ namespace Sales.Config
             services.AddSingleton<IOtpService, OtpService>();
             services.AddSingleton<ICacheService, CacheService>();
             services.AddSingleton<ISmsService, FakeSmsService>();
+            services.AddSingleton<ITokenService, JwtTokenService>();
             _isDIConfigured = true;
             return services;
         }

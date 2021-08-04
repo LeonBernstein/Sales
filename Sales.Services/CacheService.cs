@@ -27,5 +27,11 @@ namespace Sales.Services
             key = region.Value + "-" + key;
             return (T)_cache.Get(key);
         }
+
+        public void RemoveItem(CacheRegions region, string key)
+        {
+            key = region.Value + "-" + key;
+            _cache.Remove(key);
+        }
     }
 }
